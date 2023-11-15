@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Clicker Idle Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cookie Clicker Idle Game</h1>
+    <div id="stats">
+        <p>Cookies: <span id="cookieCount">0</span></p>
+        <p>Click Rate: <span id="clickRate">1</span></p>
+        <p>Auto-clickers: <span id="autoClickers">0</span></p>
+    </div>
+    <button onclick="clickCookie()">Click the cookie</button>
+    <button onclick="buyAutoClicker()">Buy Auto-clicker</button>
+
+    <script>
+        let cookies = 0;
+        let clickRate = 1;
+        let autoClickers = 0;
+
+        function clickCookie() {
+            cookies += clickRate;
+            updateStats();
+        }
+
+        function buyAutoClicker() {
+            const autoClickerCost = 10 * (autoClickers + 1);
+            if (cookies >= autoClickerCost) {
+                cookies -= autoClickerCost;
+                autoClickers += 1;
+                clickRate += 1;
+                updateStats();
+                alert(`Auto-clicker purchased! Click rate is now ${clickRate}.`);
+            } else {
+                alert("Not enough cookies to buy an auto-clicker.");
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('cookieCount').innerText = cookies;
+            document.getElementById('clickRate').innerText = clickRate;
+            document.getElementById('autoClickers').innerText = autoClickers;
+        }
+
+        // Auto-click every second
+        setInterval(function () {
+            cookies += autoClickers * clickRate;
+            updateStats();
+        }, 1000);
+    </script>
+</body>
+</html>
