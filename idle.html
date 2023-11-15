@@ -14,18 +14,69 @@
 </head>
 <body>
     <h1>Cookie Clicker Idle Game</h1>
-    <div id="stats">
-        <p>Cookies: <span id="cookieCount">0</span></p>
-        <p>Click Rate: <span id="clickRate">1</span></p>
-        <p>Auto-clickers: <span id="autoClickers">0</span></p>
+
+    <!-- Login form -->
+    <div id="loginForm">
+        <label for="email">Email:</label>
+        <input type="email" id="email" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" required><br>
+
+        <button onclick="login()">Login</button>
     </div>
-    <button onclick="clickCookie()">Click the cookie</button>
-    <button onclick="buyAutoClicker()">Buy Auto-clicker</button>
+
+    <!-- Game interface -->
+    <div id="game" style="display: none;">
+        <div id="stats">
+            <p>Cookies: <span id="cookieCount">0</span></p>
+            <p>Click Rate: <span id="clickRate">1</span></p>
+            <p>Auto-clickers: <span id="autoClickers">0</span></p>
+        </div>
+        <button onclick="clickCookie()">Click the cookie</button>
+        <button onclick="buyAutoClicker()">Buy Auto-clicker</button>
+    </div>
 
     <script>
-        let cookies = 0;
-        let clickRate = 1;
-        let autoClickers = 0;
+        // Simulated user data stored in local storage
+        const users = [
+            { email: "user@example.com", password: "password123" },
+            { email: "anotheruser@example.com", password: "securepassword" }
+        ];
+
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                // Save user data in local storage
+                localStorage.setItem('user', JSON.stringify(user));
+                
+                // Hide login form, show game interface
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('game').style.display = 'block';
+
+                // Initialize the game
+                initGame();
+            } else {
+                alert('Invalid email or password. Please try again.');
+            }
+        }
+
+        function initGame() {
+            // Retrieve user data from local storage
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                // Initialize the game with user data
+                // For simplicity, I'm just initializing cookies and click rate
+                cookies = 0;
+                clickRate = 1;
+                autoClickers = 0;
+                updateStats();
+            }
+        }
 
         function clickCookie() {
             cookies += clickRate;
