@@ -3,20 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cookie Clicker Idle Game</title>
+    <title>Cookies Game - Login/Register</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
-            margin: 20px;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f0e3;
+        }
+
+        h1 {
+            margin-top: 50px;
+            font-size: 40px;
+            color: #5e493a;
+        }
+
+        /* Forms styling */
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        .form-container h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #5e493a;
+        }
+
+        .form-container label {
+            font-size: 18px;
+            color: #5e493a;
+        }
+
+        .form-container input[type="email"],
+        .form-container input[type="password"],
+        .form-container button {
+            margin: 10px 0;
+            padding: 8px;
+            width: 250px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #fff;
+        }
+
+        .form-container button {
+            background-color: #5e493a;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-container button:hover {
+            background-color: #7e6758;
+        }
+
+        /* Cookie graphics */
+        .cookie-img {
+            width: 150px;
+            margin-top: 50px;
+        }
+
+        /* Game styles */
+        .game-container {
+            display: none;
+        }
+
+        .game-container.active {
+            display: block;
+            margin-top: 50px;
+        }
+
+        .cookie-count {
+            font-size: 24px;
+            color: #5e493a;
+        }
+
+        .cookie-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            background-color: #5e493a;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .cookie-button:hover {
+            background-color: #7e6758;
         }
     </style>
 </head>
 <body>
-    <h1>Cookie Clicker Idle Game</h1>
+    <h1>Welcome to Cookie Clicker!</h1>
+    <img class="cookie-img" src="https://image.flaticon.com/icons/svg/126/126458.svg" alt="Cookie Image">
 
     <!-- Login form -->
-    <div id="loginForm">
+    <div id="loginForm" class="form-container">
+        <h2>Login</h2>
         <label for="email">Email:</label>
         <input type="email" id="email" required><br>
 
@@ -24,89 +113,112 @@
         <input type="password" id="password" required><br>
 
         <button onclick="login()">Login</button>
+        <p>Don't have an account? <a href="#" onclick="showRegistration()">Register here</a></p>
     </div>
 
-    <!-- Game interface -->
-    <div id="game" style="display: none;">
-        <div id="stats">
-            <p>Cookies: <span id="cookieCount">0</span></p>
-            <p>Click Rate: <span id="clickRate">1</span></p>
-            <p>Auto-clickers: <span id="autoClickers">0</span></p>
-        </div>
-        <button onclick="clickCookie()">Click the cookie</button>
-        <button onclick="buyAutoClicker()">Buy Auto-clicker</button>
+    <!-- Registration form (initially hidden) -->
+    <div id="registrationForm" class="form-container" style="display: none;">
+        <h2>Register</h2>
+        <label for="regEmail">Email:</label>
+        <input type="email" id="regEmail" required><br>
+
+        <label for="regPassword">Password:</label>
+        <input type="password" id="regPassword" required><br>
+
+        <button onclick="register()">Register</button>
+        <p>Already have an account? <a href="#" onclick="showLogin()">Login here</a></p>
+    </div>
+
+    <!-- Game page (initially hidden) -->
+    <div id="gamePage" class="game-container">
+        <h2>Welcome to the Cookie Clicker Game!</h2>
+        <p class="cookie-count">Cookies: <span id="cookieCount">0</span></p>
+        <button class="cookie-button" onclick="clickCookie()">Click the Cookie</button>
     </div>
 
     <script>
-        // Simulated user data stored in local storage
-        const users = [
-            { email: "user@example.com", password: "password123" },
-            { email: "anotheruser@example.com", password: "securepassword" }
-        ];
-
         function login() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            const user = users.find(u => u.email === email && u.password === password);
+            // Retrieve user data from local storage (for demonstration purposes)
+            const user = JSON.parse(localStorage.getItem('user'));
 
-            if (user) {
-                // Save user data in local storage
-                localStorage.setItem('user', JSON.stringify(user));
-                
-                // Hide login form, show game interface
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('game').style.display = 'block';
-
-                // Initialize the game
-                initGame();
+            if (user && user.email === email && validatePassword(password, user.password)) {
+                alert('Login successful!');
+                showGamePage();
             } else {
                 alert('Invalid email or password. Please try again.');
             }
         }
 
-        function initGame() {
-            // Retrieve user data from local storage
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (user) {
-                // Initialize the game with user data
-                // For simplicity, I'm just initializing cookies and click rate
-                cookies = 0;
-                clickRate = 1;
-                autoClickers = 0;
-                updateStats();
+        function register() {
+            const regEmail = document.getElementById('regEmail').value;
+            const regPassword = document.getElementById('regPassword').value;
+
+            // Retrieve existing user data from local storage
+            const existingUser = JSON.parse(localStorage.getItem('user'));
+
+            if (existingUser && existingUser.email === regEmail) {
+                alert('An account with this email already exists.');
+                return;
             }
+
+            // Simulate server-side hashing of password
+            const hashedPassword = hashPassword(regPassword);
+
+            // Save user data in local storage (for demonstration purposes)
+            localStorage.setItem('user', JSON.stringify({ email: regEmail, password: hashedPassword, cookies: 0 }));
+
+            // Clear registration form fields
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+
+            // Hide registration form, show login form
+            document.getElementById('registrationForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        function showRegistration() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registrationForm').style.display = 'block';
+        }
+
+        function showLogin() {
+            document.getElementById('registrationForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        function showGamePage() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registrationForm').style.display = 'none';
+            document.getElementById('gamePage').classList.add('active');
+            loadCookies();
         }
 
         function clickCookie() {
-            cookies += clickRate;
-            updateStats();
+            // Increase cookie count and update display
+            const cookieCount = parseInt(localStorage.getItem('user')).cookies;
+            localStorage.setItem('user', JSON.stringify({ ...JSON.parse(localStorage.getItem('user')), cookies: cookieCount + 1 }));
+            loadCookies();
         }
 
-        function buyAutoClicker() {
-            const autoClickerCost = 10 * (autoClickers + 1);
-            if (cookies >= autoClickerCost) {
-                cookies -= autoClickerCost;
-                autoClickers += 1;
-                clickRate += 1;
-                updateStats();
-                alert(`Auto-clicker purchased! Click rate is now ${clickRate}.`);
-            } else {
-                alert("Not enough cookies to buy an auto-clicker.");
-            }
+        function loadCookies() {
+            // Display the cookie count
+            const user = JSON.parse(localStorage.getItem('user'));
+            document.getElementById('cookieCount').innerText = user.cookies;
         }
 
-        function updateStats() {
-            document.getElementById('cookieCount').innerText = cookies;
-            document.getElementById('clickRate').innerText = clickRate;
-            document.getElementById('autoClickers').innerText = autoClickers;
+        // Simulated password hashing (not secure, for demonstration only)
+        function hashPassword(password) {
+            // Simulated hashing function (e.g., should use bcrypt in a real scenario)
+            return password; // Insecure: Actual hashing function should be used
         }
 
-        // Auto-click every second
-        setInterval(function () {
-            cookies += autoClickers * clickRate;
-            updateStats();
-        }, 1000);
+        // Simulated password validation (not secure, for demonstration only)
+        function validatePassword(enteredPassword, storedPassword) {
+            return enteredPassword === storedPassword; // Insecure: Should use secure comparison
+        }
     </script>
 </body>
 </html>
