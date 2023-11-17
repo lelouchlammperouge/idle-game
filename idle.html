@@ -97,6 +97,26 @@
         .cookie-button:hover {
             background-color: #7e6758;
         }
+
+        .upgrade-container {
+            margin-top: 20px;
+        }
+
+        .upgrade-button {
+            margin: 10px;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #5e493a;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .upgrade-button:hover {
+            background-color: #7e6758;
+        }
     </style>
 </head>
 <body>
@@ -132,11 +152,22 @@
     <!-- Game page (initially hidden) -->
     <div id="gamePage" class="game-container">
         <h2>Welcome to the Cookie Clicker Game!</h2>
-        <p class="cookie-count">Cookies: <span id="cookieCount">0</span></p>
+        <p class="cookie-count">Cookies: <span id="cookieCount">0</span> per second: <span id="cps">0</span></p>
         <button class="cookie-button" onclick="clickCookie()">Click the Cookie</button>
+
+        <!-- Upgrade section -->
+        <div class="upgrade-container">
+            <h3>Upgrades</h3>
+            <button class="upgrade-button" onclick="purchaseUpgrade()">Upgrade CPS (+1 CPS) </button>
+            <!-- Add more upgrade buttons as needed -->
+        </div>
     </div>
 
     <script>
+        let autoClickInterval; // Interval for automatic cookie production
+        let cpsUpgrade = 1; // Cookies per second upgrade level
+        let upgradeCost = 10; // Initial cost for an upgrade
+
         function login() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -168,7 +199,7 @@
             const hashedPassword = hashPassword(regPassword);
 
             // Save user data in local storage (for demonstration purposes)
-            localStorage.setItem('user', JSON.stringify({ email: regEmail, password: hashedPassword, cookies: 0 }));
+            localStorage.setItem('user', JSON.stringify({ email: regEmail, password: hashedPassword, cookies: 0, cps: 0 }));
 
             // Clear registration form fields
             document.getElementById('regEmail').value = '';
@@ -179,46 +210,70 @@
             document.getElementById('loginForm').style.display = 'block';
         }
 
-        function showRegistration() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registrationForm').style.display = 'block';
-        }
+        function showRegistration
+() {
+document.getElementById('loginForm').style.display = 'none';
+document.getElementById('registrationForm').style.display = 'block';
+}
+function showLogin() {
+        document.getElementById('registrationForm').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+    }
 
-        function showLogin() {
-            document.getElementById('registrationForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-        }
+    function showGamePage() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registrationForm').style.display = 'none';
+        document.getElementById('gamePage').classList.add('active');
+        loadCookies();
+        startAutoClick();
+    }
 
-        function showGamePage() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registrationForm').style.display = 'none';
-            document.getElementById('gamePage').classList.add('active');
+    function clickCookie() {
+        const user = JSON.parse(localStorage.getItem('user'));
+        user.cookies += 1;
+        localStorage.setItem('user', JSON.stringify(user));
+        loadCookies();
+    }
+
+    function loadCookies() {
+        const user = JSON.parse(localStorage.getItem('user'));
+        document.getElementById('cookieCount').innerText = user.cookies;
+        document.getElementById('cps').innerText = user.cps;
+    }
+
+    function startAutoClick() {
+        autoClickInterval = setInterval(autoProduceCookies, 1000);
+    }
+
+    function autoProduceCookies() {
+        const user = JSON.parse(localStorage.getItem('user'));
+        user.cookies += user.cps;
+        localStorage.setItem('user', JSON.stringify(user));
+        loadCookies();
+    }
+
+    function purchaseUpgrade() {
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        if (user.cookies >= upgradeCost) {
+            user.cookies -= upgradeCost;
+            user.cps += cpsUpgrade;
+            upgradeCost = Math.ceil(upgradeCost * 1.5); // Increase upgrade cost by 50%
+            cpsUpgrade += 2; // Increment CPS for the next upgrade
+            localStorage.setItem('user', JSON.stringify(user));
             loadCookies();
+        } else {
+            alert('Not enough cookies to purchase this upgrade!');
         }
+    }
 
-        function clickCookie() {
-            // Increase cookie count and update display
-            const cookieCount = parseInt(localStorage.getItem('user')).cookies;
-            localStorage.setItem('user', JSON.stringify({ ...JSON.parse(localStorage.getItem('user')), cookies: cookieCount + 1 }));
-            loadCookies();
-        }
+    function hashPassword(password) {
+        return password;
+    }
 
-        function loadCookies() {
-            // Display the cookie count
-            const user = JSON.parse(localStorage.getItem('user'));
-            document.getElementById('cookieCount').innerText = user.cookies;
-        }
-
-        // Simulated password hashing (not secure, for demonstration only)
-        function hashPassword(password) {
-            // Simulated hashing function (e.g., should use bcrypt in a real scenario)
-            return password; // Insecure: Actual hashing function should be used
-        }
-
-        // Simulated password validation (not secure, for demonstration only)
-        function validatePassword(enteredPassword, storedPassword) {
-            return enteredPassword === storedPassword; // Insecure: Should use secure comparison
-        }
-    </script>
+    function validatePassword(enteredPassword, storedPassword) {
+        return enteredPassword === storedPassword;
+    }
+</script>
 </body>
 </html>
