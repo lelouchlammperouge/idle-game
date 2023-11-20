@@ -158,7 +158,7 @@
         <!-- Upgrade section -->
         <div class="upgrade-container">
             <h3>Upgrades</h3>
-            <button class="upgrade-button" onclick="purchaseUpgrade()">Upgrade CPS (+1 CPS) </button>
+            <button class="upgrade-button" onclick="purchaseUpgrade()">Upgrade CPS (+1 CPS) - Cost: <span id="upgradeCost">10</span> cookies</button>
             <!-- Add more upgrade buttons as needed -->
         </div>
     </div>
@@ -210,9 +210,8 @@
             document.getElementById('loginForm').style.display = 'block';
         }
 
-        function showRegistration
-() {
-document.getElementById('loginForm').style.display = 'none';
+        function showRegistration() {
+            document.getElementById('loginForm').style.display = 'none';
 document.getElementById('registrationForm').style.display = 'block';
 }
 function showLogin() {
@@ -225,6 +224,7 @@ function showLogin() {
         document.getElementById('registrationForm').style.display = 'none';
         document.getElementById('gamePage').classList.add('active');
         loadCookies();
+        loadUpgradeCost();
         startAutoClick();
     }
 
@@ -259,12 +259,17 @@ function showLogin() {
             user.cookies -= upgradeCost;
             user.cps += cpsUpgrade;
             upgradeCost = Math.ceil(upgradeCost * 1.5); // Increase upgrade cost by 50%
-            cpsUpgrade += 2; // Increment CPS for the next upgrade
+            cpsUpgrade += 1; // Increment CPS for the next upgrade
             localStorage.setItem('user', JSON.stringify(user));
             loadCookies();
+            loadUpgradeCost(); // Update displayed upgrade cost after purchase
         } else {
             alert('Not enough cookies to purchase this upgrade!');
         }
+    }
+
+    function loadUpgradeCost() {
+        document.getElementById('upgradeCost').innerText = upgradeCost;
     }
 
     function hashPassword(password) {
